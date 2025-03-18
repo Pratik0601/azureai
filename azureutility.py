@@ -31,11 +31,16 @@ def process_invoice(pdf_path):
         invoice_dict = {}
 
         for field_name, field_value in document.fields.items():
-            if field_name in ["BillingAddress", "ShippingAddress", "VendorAddress"]:
+            if "Address" in field_name:
                 if field_value and field_value.value:
                     address = field_value.value
-                    invoice_dict[
-                        field_name] = f"{address.street_address}, {address.city}, {address.state} {address.postal_code}"
+                    if isinstance(address, str):
+                            invoice_dict[field_name] = address
+                    else:
+                        # Otherwise, assume it has the desired attributes.
+                        invoice_dict[field_name] = (
+                            f"{address.street_address}, {address.city}, {address.state} {address.postal_code}"
+                        )
             else:
                 invoice_dict[field_name] = field_value.value
 
